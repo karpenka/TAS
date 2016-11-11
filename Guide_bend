@@ -1,0 +1,224 @@
+DEFINE INSTRUMENT guide (
+width_slit=0.01, m_sm=5, dRH=0, dRV=0, L=3, d=0.001, number_channels=8, m_tapering=5,l_tapering=2,l_focus_tapering=0.075,m_guide_left=4,m_guide_right=4,
+lambda=4,d_lattice_parameter=3.355, VS=2,l_focus_left=4)
+
+DECLARE
+%{
+
+// source parameters
+double source_width = 0.12 , source_height = 0.2;
+double source_T1 = 310 , source_I1 = 1.75e12 ;
+double source_T2 = 150 , source_I2 = 6.65e12 ;
+double source_T3 = 26 , source_I3 = 1.05e13 ;
+double lambda_min;
+double lambda_max;
+
+
+// beam tube parameters
+double channel_height = 0.2;
+double total_nonoptics_length = 1.820;
+
+//first guide, unchangeable
+double start_guide_width=0.06;
+double start_guide_height=0.2;
+double width_first_guide=0.06;
+double height_first_guide=0.2;
+double length_first_guide=5;
+double m_first_guide=5;
+
+//guide section
+double width_guide=0.06;
+double height_guide=0.2;
+double thickness_of_guide_walls=0.0004;
+double n=20;
+double L_st;
+double R;
+
+%}
+
+
+INITIALIZE
+%{
+lambda_min = 0;
+lambda_max = 7;
+R=(24*L-L*L)*2/2.8;
+//L_st=sqrt(144+L*L-48*R*sin(L/2/R)*(sin(L/2/R)+cos(L/2/R)));
+L_st=sqrt(144.5+4*R*R*sin(L/R/2)*sin(L/R/2)-2*R*sin(L/2/R)*(1.4*sin(L/2/R)+24*cos(L/2/R)));
+%}
+
+TRACE
+
+COMPONENT Origin = Progress_bar ()
+AT (0 ,0 , -total_nonoptics_length) ABSOLUTE
+
+//source
+
+COMPONENT Source = Source_gen ( focus_xw =  start_guide_width ,
+focus_yh = channel_height , dist = total_nonoptics_length , I1 = source_I1 ,
+yheight = source_height , xwidth = source_width , verbose = 1 ,
+T1 = source_T1, Lmin = lambda_min, Lmax = lambda_max,
+T2 = source_T2 , I2 = source_I2 , T3 = source_T3 ,
+I3 = source_I3)
+AT (0 , 0 , -total_nonoptics_length) RELATIVE ABSOLUTE
+
+COMPONENT Source_arm = Arm(
+    )
+  AT (0, 0, 0) RELATIVE ABSOLUTE
+
+/*
+COMPONENT mon2 = Monitor_nD(
+    xwidth = 0.06, yheight = 0.2, options = "lambda, limits=[2.7 8.3]",
+    filename = "nnn")
+  AT (0, 0, 0.01) RELATIVE PREVIOUS
+*/
+
+COMPONENT CG_0 = Guide_gravity(
+    w1 =width_first_guide, h1 = height_first_guide, l = length_first_guide, m = m_first_guide,
+    G = -9.81)
+  AT (0, 0, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_In= Arm()
+    AT (0,0,length_first_guide) RELATIVE PREVIOUS
+
+COMPONENT  CG_1 = Guide_gravity(
+    w1 = width_guide, h1 = height_guide,  l = L/n,
+mleft=m_sm,mright=m_sm,mtop=1,mbottom=1,
+nslit = number_channels, d = thickness_of_guide_walls, G = -9.81)
+  AT (0, 0, 0) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1) 
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+//5
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+//10
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+//15
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT COPY(CG_1) = COPY(CG_1)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+  ROTATED (0, -(d+L/n)/R*180/PI, 0) RELATIVE PREVIOUS
+//20
+
+COMPONENT  CG_2 = Guide_gravity(
+    w1 = width_guide, h1 = height_guide,  l = L_st-l_tapering,
+mleft=m_guide_left,mright=m_guide_right,mtop=1,mbottom=1,
+nslit = 1, d = thickness_of_guide_walls, G = -9.81)
+  AT (0, 0, d+L/n) RELATIVE PREVIOUS
+
+COMPONENT CG_Out=Arm()
+    AT (0,0,L_st-l_tapering+0.001) RELATIVE PREVIOUS
+
+/*
+COMPONENT CG_tap = Guide_tapering(
+    option = "parabolical", w1 = 0.06, h1 = 0.2, l = l_tapering,
+    loutw = l_focus_tapering, mx = m_tapering, my = 1)
+  AT (0, 0, 0.01) RELATIVE PREVIOUS
+*/
+
+COMPONENT CG_tap = Guide_tapering(
+    option = "elliptical", w1 = 0.06, h1 = 0.2, l = l_tapering,
+    linw = l_focus_left, loutw = l_focus_tapering, mx = m_tapering)
+  AT (0, 0, 0.01) RELATIVE PREVIOUS
+
+//l_focus_tapering+l_tapering
+COMPONENT monit_before_monocr = Monitor_nD(
+    xwidth = width_slit, yheight = 0.2, filename = "ndmon", options="lambda limits=[0,7]")
+  AT (0, 0,  l_focus_tapering+l_tapering) RELATIVE PREVIOUS
+
+
+COMPONENT slit_VS = Slit(
+    xwidth = width_slit, yheight = 0.2)
+  AT (0, 0, 0) RELATIVE PREVIOUS
+
+/*
+COMPONENT mon_IN = Arm(
+    )
+  AT (0, 0, l_focus_tapering+VS+l_tapering) RELATIVE CG_tap
+ 
+
+COMPONENT mon_curv = Monochromator_curved(
+    zwidth = 0.01, yheight = 0.01, NH = 50, NV = 50, DM = d_lattice_parameter,
+    RH = -2*VS*d_lattice_parameter/lambda+dRH, RV=0)
+  AT (0, 0, 0) RELATIVE mon_IN
+ ROTATED (0, -asin(lambda/2/d_lattice_parameter)*RAD2DEG, 0) RELATIVE mon_IN
+
+COMPONENT mon_OUT = Arm(
+    )
+  AT (0, 0, l_focus_tapering+VS+l_tapering) RELATIVE CG_tap
+  ROTATED (0, -2*asin(lambda/2/d_lattice_parameter)*RAD2DEG, 0) RELATIVE CG_tap
+
+COMPONENT monit = Monitor_nD(
+    xwidth = 0.01, yheight = 0.2, filename = "ndmon2", options="lambda limits[2.5 6]")
+  AT (0, 0, VS) RELATIVE PREVIOUS
+*/
+
+FINALLY
+%{
+%}
+
+END
